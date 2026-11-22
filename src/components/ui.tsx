@@ -16,7 +16,8 @@ export function ModelCard({ model, compact = false }: { model: Model; compact?: 
 
   function toggleList(key: string, value: string, current: boolean) {
     const values = readSlugs(key);
-    const next = current ? values.filter((slug) => slug !== value) : [...values, value].slice(-4);
+    const limit = key === "oneatlas:compare" ? 3 : 4;
+    const next = current ? values.filter((slug) => slug !== value) : [...values.filter((slug) => slug !== value), value].slice(-limit);
     localStorage.setItem(key, JSON.stringify(next));
     window.dispatchEvent(new Event(key === "oneatlas:favorites" ? "favorites-changed" : "compare-changed"));
   }

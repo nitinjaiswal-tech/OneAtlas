@@ -1,26 +1,34 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Grid2X2, List, Search, SlidersHorizontal, X } from "lucide-react";
 import { ErrorState, LoadingState, ModelCard, PageHeading } from "@/components/ui";
 import type { Model, ModelListResponse, Provider } from "@/lib/types";
 
 export default function ModelsPage() {
-  return <Suspense fallback={<LoadingState label="Loading model catalog…" />}><ModelsExplorer /></Suspense>;
+  return <Suspense fallback={<LoadingState label="Loading model catalog…" />}><ModelsRoute /></Suspense>;
 }
 
-function ModelsExplorer() {
+function ModelsRoute() {
   const searchParams = useSearchParams();
+  const sort = searchParams.get("sort");
+  const initialSort = sort === "inputPrice" || sort === "contextWindow" || sort === "speedScore" ? sort : "popularity";
+  const query = searchParams.toString();
+  return <ModelsExplorer key={query} initialSearch={searchParams.get("search") ?? ""} initialSort={initialSort} />;
+}
+
+function ModelsExplorer({ initialSearch, initialSort }: { initialSearch: string; initialSort: string }) {
+  const router = useRouter();
   const [models, setModels] = useState<Model[]>([]);
   const [providers, setProviders] = useState<Provider[]>([]);
-  const [search, setSearch] = useState(searchParams.get("search") ?? "");
+  const [search, setSearch] = useState(initialSearch);
   const [provider, setProvider] = useState("");
   const [capability, setCapability] = useState("");
   const [category, setCategory] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [minContext, setMinContext] = useState("");
-  const [sort, setSort] = useState(searchParams.get("sort") ?? "popularity");
+  const [sort, setSort] = useState(initialSort);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [view, setView] = useState<"grid" | "list">("grid");
@@ -65,7 +73,16 @@ function ModelsExplorer() {
 
   function clearFilters() {
     setLoading(true);
+    setError("");
     setProvider(""); setCapability(""); setCategory(""); setMaxPrice(""); setMinContext(""); setPage(1);
+  }
+
+  function clearSearchAndFilters() {
+    setLoading(true);
+    setError("");
+    setSearch("");
+    setProvider(""); setCapability(""); setCategory(""); setMaxPrice(""); setMinContext(""); setPage(1);
+    router.replace("/models");
   }
 
   function filterChange(setter: (value: string) => void, value: string) {
@@ -83,9 +100,9 @@ function ModelsExplorer() {
 
   return (
     <div>
-      <PageHeading eyebrow="THE MODEL CATALOG" title="Explore models" description="Search, filter, and find the right model for what you’re building." action={<span className="catalog-count"><strong>{total || 25}</strong> models indexed</span>} />
+      <PageHeading eyebrow="THE MODEL CATALOG" title="Explore models" description="Search, filter, and find the right model for what you’re building." action={<span className="catalog-count"><strong>{loading && total === 0 ? "—" : total}</strong> models indexed</span>} />
       <section className="explorer-toolbar panel">
-        <label className="explorer-search"><Search size={16} /><input value={search} onChange={(event) => filterChange(setSearch, event.target.value)} placeholder="Search by model or provider..." aria-label="Search model catalog" /><kbd>↵</kbd></label>
+        <label className="explorer-search"><Search size={16} /><input value={search} onChange={(event) => filterChange(setSearch, event.target.value)} placeholder="Search by model or provider..." aria-label="Search model catalog" /></label>
         <div className="filter-row">
           <label className="select-filter"><span>Provider</span><select value={provider} onChange={(event) => filterChange(setProvider, event.target.value)}><option value="">All providers</option>{providers.map((item) => <option key={item.slug} value={item.slug}>{item.name}</option>)}</select></label>
           <label className="select-filter"><span>Capability</span><select value={capability} onChange={(event) => filterChange(setCapability, event.target.value)}><option value="">Any capability</option>{["Reasoning", "Coding", "Vision", "Tool use", "Open weights", "RAG"].map((item) => <option key={item}>{item}</option>)}</select></label>
@@ -102,7 +119,7 @@ function ModelsExplorer() {
           <section className={`model-grid ${view === "list" ? "model-list-view" : ""}`}>{models.map((model) => <ModelCard key={model.slug} model={model} compact={view === "list"} />)}</section>
           <div className="pagination"><button className="button button-secondary" disabled={page <= 1} onClick={() => { setLoading(true); setPage((value) => value - 1); }}>Previous</button><span>Page <strong>{page}</strong> of <strong>{pageCount}</strong></span><button className="button button-secondary" disabled={page >= pageCount} onClick={() => { setLoading(true); setPage((value) => value + 1); }}>Next</button></div>
         </>
-      ) : <div className="empty-results"><strong>No models match those filters</strong><p>Try a different search or clear some filters.</p><button className="button button-secondary" onClick={clearFilters}>Clear filters</button></div>}
+      ) : <div className="empty-results"><strong>No models match those filters</strong><p>Try a different search or clear some filters.</p><button className="button button-secondary" onClick={clearSearchAndFilters}>Clear search &amp; filters</button></div>}
     </div>
   );
 }

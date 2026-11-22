@@ -33,6 +33,7 @@ button, input, select { font: inherit; }
 button, a, select { -webkit-tap-highlight-color: transparent; }
 button { color: inherit; }
 a { color: inherit; text-decoration: none; }
+button:focus-visible, a:focus-visible { outline: 2px solid #78d7ba; outline-offset: 3px; }
 ::selection { color: #0b1512; background: #87e2c6; }
 
 .app-shell { min-height: 100vh; }
@@ -149,7 +150,7 @@ h1, h2, h3, p { margin-top: 0; }
 .model-card-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 7px; margin-top: 14px; color: #eef0f2; font-size: 14px; font-weight: 570; letter-spacing: -.3px; }
 .model-card-title:hover { color: #a4e1ce; }
 .model-version { color: #68717b; font-size: 8px; font-weight: 400; letter-spacing: 0; }
-.model-card-description { min-height: 33px; margin: 7px 0 10px; color: #858e98; font-size: 9.5px; line-height: 1.6; }
+.model-card-description { min-height: 33px; margin: 7px 0 10px; color: #929ba4; font-size: 10px; line-height: 1.65; }
 .model-tags { display: flex; flex-wrap: wrap; gap: 5px; }
 .tag { min-height: 20px; display: inline-flex; align-items: center; padding: 0 7px; border: 1px solid #2c3239; border-radius: 4px; color: #a1a8b1; background: #191d22; font-size: 8px; white-space: nowrap; }
 .tag-green { border-color: #305247; color: #a6dac7; background: #18251f; }

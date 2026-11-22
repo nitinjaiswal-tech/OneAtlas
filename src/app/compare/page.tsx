@@ -22,9 +22,9 @@ export default function ComparePage() {
         setCatalog(data.models);
         const saved = readSlugs("oneatlas:compare");
         const requested = new URLSearchParams(window.location.search).get("model");
-        const initial = requested && data.models.some((model) => model.slug === requested)
-          ? [requested, ...data.models.filter((model) => model.slug !== requested).slice(0, 2).map((model) => model.slug)]
-          : saved.length >= 3 ? saved.slice(0, 3) : data.models.slice(0, 3).map((model) => model.slug);
+        const validSlugs = new Set(data.models.map((model) => model.slug));
+        const candidates = [...(requested ? [requested] : []), ...saved.slice(-3), ...data.models.map((model) => model.slug)];
+        const initial = [...new Set(candidates.filter((slug) => validSlugs.has(slug)))].slice(0, 3);
         setSelected(initial);
         localStorage.setItem("oneatlas:compare", JSON.stringify(initial));
       })

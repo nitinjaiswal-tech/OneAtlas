@@ -8,7 +8,6 @@ import {
   BarChart3,
   Boxes,
   Building2,
-  ChevronDown,
   Command,
   GitCompareArrows,
   Heart,
@@ -38,6 +37,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     event.preventDefault();
     const value = search.trim();
     router.push(value ? `/models?search=${encodeURIComponent(value)}` : "/models");
+    setSearch("");
     setMenuOpen(false);
   }
 
@@ -54,8 +54,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
         <div className="workspace-switcher">
           <span className="workspace-icon"><Command size={15} /></span>
-          <span><strong>Workspace</strong><small>Personal space</small></span>
-          <ChevronDown size={14} className="muted-icon" />
+          <span><strong>Model catalog</strong><small>Demo workspace</small></span>
         </div>
         <p className="nav-caption">DISCOVER</p>
         <nav className="side-nav" aria-label="Main navigation">

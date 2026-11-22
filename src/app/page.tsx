@@ -45,7 +45,7 @@ export default function DashboardPage() {
   const cheapest = useMemo(() => [...models].sort((a, b) => a.inputPrice - b.inputPrice).slice(0, 5), [models]);
   const recent = useMemo(() => [...models].sort((a, b) => b.releaseDate.localeCompare(a.releaseDate)).slice(0, 4), [models]);
   const featured = models.slice(0, 3);
-  const chartData = useMemo(() => [...models].sort((a, b) => a.inputPrice - b.inputPrice).slice(0, 8).map((model) => ({ name: model.name.replace(/ (?:2\.5|2\.0|4\.1|4o)/g, ""), input: model.inputPrice, output: model.outputPrice })), [models]);
+  const chartData = useMemo(() => [...models].sort((a, b) => a.inputPrice - b.inputPrice).slice(0, 8).map((model) => ({ name: model.name.length > 13 ? `${model.name.slice(0, 12)}…` : model.name, input: model.inputPrice, output: model.outputPrice })), [models]);
 
   return (
     <div className="dashboard-page">
@@ -96,7 +96,7 @@ export default function DashboardPage() {
 
           <div className="dashboard-bottom-grid">
             <section className="panel recent-panel">
-              <div className="panel-heading panel-heading-spread"><div><p className="eyebrow">FRESH IN THE CATALOG</p><h2>Recently added</h2></div><Clock3 size={17} className="muted-icon" /></div>
+              <div className="panel-heading panel-heading-spread"><div><p className="eyebrow">RECENT MODEL RELEASES</p><h2>Latest releases</h2></div><Clock3 size={17} className="muted-icon" /></div>
               <div className="recent-list">{recent.map((model) => <Link className="recent-row" href={`/models/${model.slug}`} key={model.slug}>
                 <span className="recent-provider" style={{ backgroundColor: `${model.providerColor}18`, color: model.providerColor }}>{model.providerName.slice(0, 1)}</span>
                 <span className="recent-name"><strong>{model.name}</strong><small>{model.providerName} · {new Date(`${model.releaseDate}T00:00:00`).toLocaleDateString("en", { month: "short", day: "numeric", year: "numeric" })}</small></span><ArrowRight size={14} className="muted-icon" />
