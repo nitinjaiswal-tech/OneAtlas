@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Provider {
+  id           String  @id @default(cuid())
+  name         String  @unique
+  slug         String  @unique
+  description  String
+  color        String
+  initials     String
+  headquarters String
+  models       Model[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([name])
+}
+
+model Model {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  providerId      String
+  provider        Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  description     String
+  version         String
+  inputPrice      Float
+  outputPrice     Float
+  contextWindow   Int
+  maxOutputTokens Int
+  modalities      String[]
+  openSource      Boolean  @default(false)
+  releaseDate     DateTime
+  popularity      Int      @default(0)
+  speedScore      Int      @default(0)
+  category        String
+  capabilities    ModelCapability[]
+  benchmarks      ModelBenchmark[]
+  favorites       Favorite[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([providerId, popularity])
+  @@index([inputPrice, outputPrice])
+  @@index([contextWindow])
+  @@index([category])
+}
+
+model Capability {
+  id     String            @id @default(cuid())
+  name   String            @unique
+  models ModelCapability[]
+}
+
+model ModelCapability {
+  modelId      String
+  capabilityId String
+  model        Model      @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  capability   Capability @relation(fields: [capabilityId], references: [id], onDelete: Cascade)
+
+  @@id([modelId, capabilityId])
+  @@index([capabilityId])
+}
+
+model Benchmark {
+  id     String           @id @default(cuid())
+  name   String
+  slug   String           @unique
+  unit   String           @default("%")
+  models ModelBenchmark[]
+}
+
+model ModelBenchmark {
+  modelId     String
+  benchmarkId String
+  score       Float
+  model       Model     @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  benchmark   Benchmark @relation(fields: [benchmarkId], references: [id], onDelete: Cascade)
+
+  @@id([modelId, benchmarkId])
+  @@index([benchmarkId, score])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userKey   String
+  modelId   String
+  model     Model    @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userKey, modelId])
+  @@index([userKey])
+}
